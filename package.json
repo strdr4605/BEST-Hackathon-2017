@@ -1,0 +1,25 @@
+{
+  "name": "best-hackathon-2017",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/strdr4605/BEST-Hackathon-2017.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/strdr4605/BEST-Hackathon-2017/issues"
+  },
+  "homepage": "https://github.com/strdr4605/BEST-Hackathon-2017#readme",
+  "dependencies": {
+    "express": "^4.14.1",
+    "nodemon": "^1.11.0",
+    "socket.io": "^1.7.2"
+  }
+}
