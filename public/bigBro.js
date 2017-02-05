@@ -1,3 +1,4 @@
+
 $(function() {
   var FADE_TIME = 150; // ms
   var TYPING_TIMER_LENGTH = 400; // ms
@@ -11,19 +12,36 @@ $(function() {
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
+  var $devices = $('.devices');
+  var $cam1 = $('.cam1');
+  var $cam2 = $('.cam2');
+  var $cam3 = $('.cam3');
   var $inputMessage = $('.inputMessage'); // Input message input box
 
   var $loginPage = $('.login.page'); // The login page
   var $chatPage = $('.chat.page'); // The chatroom page
+  $loginPage.hide()
+  $chatPage.hide()
 
   // Prompt for setting a username
   var username;
+  var mainClient;
+  var client = 'browser';
   var connected = false;
   var typing = false;
   var lastTypingTime;
-  var $currentInput = $usernameInput.focus();
-
+  // var $currentInput = $usernameInput.focus();
+  var $currentInput;
   var socket = io();
+
+  $(document).on('click', 'li', function () {
+    mainClient = $(this).text()
+    $('li').css('background-color', 'black');
+    $(this).css('background-color', 'gray');
+  })
+
+  $cam1.hide();
+  $cam2.hide();
 
   function addParticipantsMessage (data) {
     var message = '';
@@ -32,12 +50,14 @@ $(function() {
     } else {
       message += "there are " + data.numUsers + " participants";
     }
+    data.mobileUsersList.forEach(el =>  log2(el));
     log(message);
   }
 
   // Sets the client's username
   function setUsername () {
-    username = cleanInput($usernameInput.val().trim());
+    // username = cleanInput($usernameInput.val().trim());
+    username = Date.now() + ''
 
     // If the username is valid
     if (username) {
@@ -47,7 +67,7 @@ $(function() {
       $currentInput = $inputMessage.focus();
 
       // Tell the server your username
-      socket.emit('add user', username);
+      socket.emit('add user', username, client);
     }
   }
 
@@ -69,9 +89,16 @@ $(function() {
   }
 
   // Log a message
+  function log2 (message, options) {
+    var $el = $('<li>').addClass('log list-group-item').text(message);
+    addMessageElement2($el, options);
+    console.log(message)
+  }
+
   function log (message, options) {
-    var $el = $('<li>').addClass('log').text(message);
+    var $el = $('<li>').addClass('log list-group-item').text(message);
     addMessageElement($el, options);
+    console.log(message)
   }
 
   // Adds the visual chat message to the message list
@@ -86,7 +113,7 @@ $(function() {
 
     var $usernameDiv = $('<span class="username"/>')
       .text(data.username)
-      .css('color', getUsernameColor(data.username));
+      .css('color', 'black');
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
 
@@ -142,6 +169,32 @@ $(function() {
       $messages.append($el);
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
+  }
+
+  function addMessageElement2 (el, options) {
+    var $el = $(el);
+
+    // Setup default options
+    if (!options) {
+      options = {};
+    }
+    if (typeof options.fade === 'undefined') {
+      options.fade = true;
+    }
+    if (typeof options.prepend === 'undefined') {
+      options.prepend = false;
+    }
+
+    // Apply options
+    if (options.fade) {
+      $el.hide().fadeIn(FADE_TIME);
+    }
+    if (options.prepend) {
+      $devices.prepend($el);
+    } else {
+      $devices.append($el);
+    }
+    $devices[0].scrollTop = $devices[0].scrollHeight;
   }
 
   // Prevents input from having injected markup
@@ -239,10 +292,30 @@ $(function() {
   // Whenever the server emits 'new message', update the chat body
   socket.on('new message', function (data) {
     addChatMessage(data);
+    console.log(mainClient,data.username,data.message)
+    if(mainClient == data.username) {
+      switch(data.message) {
+        case '1':$cam1.show(); $cam2.hide(); $cam3.hide(); $('#a1').css("background-color","red"); $('#a2, #a3, #a4, #a5, #a6').css("background-color","black"); break;
+        case '2':$cam1.show(); $cam2.hide(); $cam3.hide(); $('#a2').css("background-color","red"); $('#a1, #a3, #a4, #a5, #a6').css("background-color","black"); break;
+        case '3':$cam1.hide(); $cam2.show(); $cam3.hide(); $('#a3').css("background-color","red"); $('#a2, #a1, #a4, #a5, #a6').css("background-color","black"); break;
+        case '4':$cam1.hide(); $cam2.show(); $cam3.hide(); $('#a4').css("background-color","red"); $('#a2, #a3, #a1, #a5, #a6').css("background-color","black"); break;
+        case '5':$cam1.hide(); $cam2.hide(); $cam3.show(); $('#a5').css("background-color","red"); $('#a2, #a3, #a4, #a1, #a6').css("background-color","black"); break;
+        case '6':$cam1.hide(); $cam2.hide(); $cam3.show(); $('#a6').css("background-color","red"); $('#a2, #a3, #a4, #a5, #a1').css("background-color","black"); break;
+      }
+    }
+    //   if(data.message == 1 || data.message == 2){
+    //     $cam1.show(); $cam2.hide(); $cam3.hide();
+    //   } else if(data.message == 3 || data.message == 4){
+    //     $cam1.hide(); $cam2.show(); $cam3.hide();
+    //   } else if(data.message == 5 || data.message == 6){
+    //     $cam1.hide(); $cam2.hide(); $cam3.show();
+    //   }
+    // }
   });
 
   // Whenever the server emits 'user joined', log it in the chat body
   socket.on('user joined', function (data) {
+    $('.devices').empty()
     log(data.username + ' joined');
     addParticipantsMessage(data);
   });
@@ -250,7 +323,7 @@ $(function() {
   // Whenever the server emits 'user left', log it in the chat body
   socket.on('user left', function (data) {
     log(data.username + ' left');
-    addParticipantsMessage(data);
+    $('li:contains('+ data.username +')').remove();
     removeChatTyping(data);
   });
 
@@ -271,7 +344,7 @@ $(function() {
   socket.on('reconnect', function () {
     log('you have been reconnected');
     if (username) {
-      socket.emit('add user', username);
+      socket.emit('add user', username, client);
     }
   });
 

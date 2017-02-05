@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BigBro</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="myStyle.css">
+</head>
+<body>
+  <video class="cam1" width="640" height="320" autoplay src="http://10.244.53.34:8081"></video>
+  <video class="cam2" width="640" height="320" autoplay src="http://10.244.53.51:5779"></video>
+  <video class="cam3" width="640" height="320" autoplay src="http://10.244.53.51:5779"></video>
+  <ul class="devices list-group">List of devices</ul>
+
+  <div class="first-line">
+    <div class="area" id="a2"></div>
+    <div class="area" id="a3"></div>
+    <div class="area" id="a4"></div>
+    <div class="area" id="a5"></div>
+  </div>
+  <div class="second-line">
+    <div class="area" id="a1"></div>
+    <div class="area" id="a6"></div>
+  </div>
+
+  <ul class="pages">
+    <li class="chat page">
+      <div class="chatArea">
+        <ul class="messages"></ul>
+      </div>
+      <input class="inputMessage" placeholder="Type here..."/>
+    </li>
+    <li class="login page">
+      <div class="form">
+        <h3 class="title">What's your nickname?</h3>
+        <input class="usernameInput" type="text" maxlength="14" />
+      </div>
+    </li>
+  </ul>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/bigBro.js"></script>
+</body>
+</html>

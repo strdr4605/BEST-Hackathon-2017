@@ -1,0 +1,59 @@
+body {
+  background-image: url('scheme.png');
+  background-repeat: no-repeat;
+  background-size: 100vw 100vh;
+  height: 100vh;
+  position: relative;
+}
+
+.devices {
+  position: absolute;
+  margin-top: 20vh;
+  margin-left: 60vw;
+}
+
+.cam1, .cam2, .cam3 {
+  position: absolute;
+  width: 40vw;
+  height: 42vh;
+  margin-left: 5.5vw;
+  margin-top: 5vh;
+}
+
+
+
+.devices li {
+  width: 10vw;
+  background-color: black;
+  color: white;
+  border: none;
+}
+
+.first-line {
+  display: flex;
+  position: absolute;
+  margin-left: 10vw;
+  margin-top: 65vh;
+}
+
+.second-line {
+  display: flex;
+  position: absolute;
+  margin-left: 10vw;
+  margin-top: 75vh;
+}
+
+.area {
+  background-color: black;
+  border: 3px solid #CFB675;
+  height: 10vh;
+  width: 10vh;
+}
+
+.second-line .area {
+  margin: 0 10vh;
+}
+
+#a1 {
+  margin-left: 0;
+}
