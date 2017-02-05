@@ -37,10 +37,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -152,7 +152,7 @@ public class MainFragment extends Fragment {
                         TriangulationCoord.put(major,"" + map.get(major)[2]);
                     }
 
-                    if(map.keySet().size() == 3) {
+                    if(map.keySet().size() == 6) {
                         Map<String, String[]> NewMap = new HashMap<String, String[]>();
                         getPosition(TriangulationCoord);
                         for(String key: map.keySet()) {
@@ -167,10 +167,13 @@ public class MainFragment extends Fragment {
                 }
             });
         }
-        float[][] coordinates = {{2,0},{0,3},{3,4}};
+        float[][] coordinates = {{2,4},{0,1},{3,0},{5,2},{8,0},{6,4}};
         beaconCoordinates.put("101",coordinates[0]);
         beaconCoordinates.put("102",coordinates[1]);
         beaconCoordinates.put("103",coordinates[2]);
+        beaconCoordinates.put("104",coordinates[3]);
+        beaconCoordinates.put("105",coordinates[4]);
+        beaconCoordinates.put("106",coordinates[5]);
     }
 
     @Override
@@ -600,15 +603,32 @@ public class MainFragment extends Fragment {
     
     public void getPosition(Map map) {
         Object[] keys = map.keySet().toArray();
-        float xa = beaconCoordinates.get(keys[0])[0];
-        float ya = beaconCoordinates.get(keys[0])[1];
-        float xb = beaconCoordinates.get(keys[1])[0];
-        float yb = beaconCoordinates.get(keys[1])[1];
-        float xc = beaconCoordinates.get(keys[2])[0];
-        float yc = beaconCoordinates.get(keys[2])[1];
-        float da = Float.parseFloat((String) map.get(keys[0]));
-        float db = Float.parseFloat((String) map.get(keys[1]));
-        float dc = Float.parseFloat((String) map.get(keys[2]));
+        int[] min_index = {};
+        for(int k = 0; k < 3; ++k){
+            int l = 0;
+            while(Arrays.asList(min_index).contains(l)){
+                ++l;
+            }
+            min_index[k] = 0;
+            for(int i = 0; i < 6; ++i){
+                if( Float.parseFloat((String) map.get(keys[min_index[k]])) > Float.parseFloat((String) map.get(keys[i]))) {
+                    if(Arrays.asList(min_index).contains(i)){
+                        continue;
+                    }
+                    min_index[k] = Float.parseFloat((String) map.get(keys[i]));
+                }
+            }
+        }
+
+        float xa = beaconCoordinates.get(keys[min_index[0]])[0];
+        float ya = beaconCoordinates.get(keys[min_index[0]])[1];
+        float xb = beaconCoordinates.get(keys[min_index[1]])[0];
+        float yb = beaconCoordinates.get(keys[min_index[1]])[1];
+        float xc = beaconCoordinates.get(keys[min_index[2]])[0];
+        float yc = beaconCoordinates.get(keys[min_index[2]])[1];
+        float da = Float.parseFloat((String) map.get(keys[min_index[0]]));
+        float db = Float.parseFloat((String) map.get(keys[min_index[1]]));
+        float dc = Float.parseFloat((String) map.get(keys[min_index[2]]));
         double yp = (Math.pow(da,2) - Math.pow(dc,2) - Math.pow(xa,2) + Math.pow(xc,2) - Math.pow(ya,2) + Math.pow(yc,2) + (Math.pow(db,2) - Math.pow(da,2) + Math.pow(xa,2) - Math.pow(xb,2) + Math.pow(ya,2) - Math.pow(yb,2))/(2*xa - 2*xb))/((ya - yb)/(xa - xb)*(2*xa - 2*xc) - 2*ya +2*yc);
         double xp = (Math.pow(db,2) - Math.pow(da,2) + Math.pow(xa,2) - Math.pow(xb,2) - Math.pow(ya,2) - Math.pow(yb,2) - yp*(2*ya -2*yb))/(2*xa - 2*xb);
         Log.e("X","" + xp);
