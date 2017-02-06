@@ -38,6 +38,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,7 +136,7 @@ public class MainFragment extends Fragment {
                     int change = 0;
                     String data;
                     int TxPower;
-                    String major;
+                    String major = null;
                     Log.v("Name","" + result.getDevice());
                     Log.v("RSSI","" + result.getRssi());
                     Log.v("ScanRecord",result.getScanRecord().toString());
@@ -150,11 +151,12 @@ public class MainFragment extends Fragment {
                         Log.v("Major","" + major);
                         calculateDistance(major,TxPower,rssi);
                         TriangulationCoord.put(major,"" + map.get(major)[2]);
+                        average(major,map.get(major)[2]);
                     }
 
-                    if(map.keySet().size() == 3) {
+                    if(map.keySet().size() == 6) {
                         Map<String, String[]> NewMap = new HashMap<String, String[]>();
-                        getPosition(TriangulationCoord);
+                        getPosition(getBiggerDistance());
                         for(String key: map.keySet()) {
                             NewMap.put(key,map.get(key));
                         }
@@ -164,13 +166,25 @@ public class MainFragment extends Fragment {
                         map.clear();
                         Log.v("Map","" + NewMap.keySet());
                     }
+                    if(major != null && AverageDistance.size() > 0) {
+                        if (Integer.parseInt(AverageDistance.get(major)[1]) >= 10) {
+                            for (String key : AverageDistance.keySet()) {
+                                Log.e("Average_distance_" + key, "" + (Double.parseDouble(AverageDistance.get(key)[0]) /
+                                        Integer.parseInt(AverageDistance.get(key)[1])));
+                            }
+                            AverageDistance.clear();
+                        }
+                    }
                 }
             });
         }
-        float[][] coordinates = {{2,0},{0,3},{3,4}};
+        float[][] coordinates = {{2,0},{0,3},{3,4}, {5,2}, {8,0}, {6,4}};
         beaconCoordinates.put("101",coordinates[0]);
         beaconCoordinates.put("102",coordinates[1]);
         beaconCoordinates.put("103",coordinates[2]);
+        beaconCoordinates.put("104",coordinates[3]);
+        beaconCoordinates.put("105",coordinates[4]);
+        beaconCoordinates.put("106",coordinates[5]);
     }
 
     @Override
@@ -576,6 +590,21 @@ public class MainFragment extends Fragment {
         map.put(major,values);
     }
 
+    public void average(String major, String distance) {
+        String[] values;
+        if(!AverageDistance.keySet().contains(major)) {
+            values = new String[2];
+            values[0] = distance;
+            values[1] = "" + 1;
+        }
+        else {
+            values = AverageDistance.get(major);
+            values[0] = String.valueOf(Double.parseDouble(values[0]) + Double.parseDouble(distance));
+            values[1] = String.valueOf(Integer.parseInt(values[1]) + 1);
+        }
+        AverageDistance.put(major,values);
+    }
+
     public String getMinDistance(Map<String, String[]> map) {
         String min_name = null;
         double min_distance = 1000;
@@ -599,7 +628,7 @@ public class MainFragment extends Fragment {
     }
     
     public void getPosition(Map map) {
-        Object[] keys = map.keySet().toArray();
+        Object[] keys = map.keySet().toArray();;
         float xa = beaconCoordinates.get(keys[0])[0];
         float ya = beaconCoordinates.get(keys[0])[1];
         float xb = beaconCoordinates.get(keys[1])[0];
@@ -614,6 +643,56 @@ public class MainFragment extends Fragment {
         Log.e("X","" + xp);
         Log.e("Y","" + yp);
 
+    }
+
+    public Map<String, String> getBiggerDistance() {
+        String max_name = null;
+        String max_value = null;
+        String[] keys = new String[TriangulationCoord.size()];
+        int k = 0;
+        Map<String, String> Coordinates = new HashMap<String, String>();
+        Map<String, String> BiggerDistance = new HashMap<String, String>();
+        for(String key: TriangulationCoord.keySet()) {
+            Coordinates.put(key,TriangulationCoord.get(key));
+            if(max_name == null && max_value == null) {
+                max_name = key;
+                max_value = TriangulationCoord.get(key);
+            }
+            keys[k] = key;
+            k++;
+        }
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < keys.length; j++) {
+                if(Coordinates.get(keys[j]) != null && keys[j] != null) {
+                    if (Double.parseDouble(Coordinates.get(keys[j])) > Double.parseDouble(max_value)) {
+                        max_value = Coordinates.get(keys[j]);
+                        max_name = keys[j];
+                    }
+                }
+            }
+            Coordinates.remove(max_name);
+            keys = removeElements(keys,max_name);
+            BiggerDistance.put(max_name,max_value);
+            if(keys[0] != null) {
+                max_name = keys[0];
+                max_value = Coordinates.get(max_name);
+            }
+        }
+        return BiggerDistance;
+    }
+
+    public static String[] removeElements(String[] input, String deleteMe) {
+        String[] result = new String[input.length];
+        int i = 0;
+
+        for(String item : input)
+            if(!deleteMe.equals(item)) {
+                result[i] = item;
+                i ++;
+            }
+
+
+        return result;
     }
 }
 
