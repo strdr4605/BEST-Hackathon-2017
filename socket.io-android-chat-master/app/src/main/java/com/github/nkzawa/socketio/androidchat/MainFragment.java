@@ -37,11 +37,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -178,7 +178,9 @@ public class MainFragment extends Fragment {
                 }
             });
         }
-        float[][] coordinates = {{2,0},{0,3},{3,4}, {5,2}, {8,0}, {6,4}};
+
+        float[][] coordinates = {{2,4}, {0,1}, {3,0}, {5,2}, {8,0}, {6,4}};
+
         beaconCoordinates.put("101",coordinates[0]);
         beaconCoordinates.put("102",coordinates[1]);
         beaconCoordinates.put("103",coordinates[2]);
@@ -638,6 +640,7 @@ public class MainFragment extends Fragment {
         float da = Float.parseFloat((String) map.get(keys[0]));
         float db = Float.parseFloat((String) map.get(keys[1]));
         float dc = Float.parseFloat((String) map.get(keys[2]));
+
         double yp = (Math.pow(da,2) - Math.pow(dc,2) - Math.pow(xa,2) + Math.pow(xc,2) - Math.pow(ya,2) + Math.pow(yc,2) + (Math.pow(db,2) - Math.pow(da,2) + Math.pow(xa,2) - Math.pow(xb,2) + Math.pow(ya,2) - Math.pow(yb,2))/(2*xa - 2*xb))/((ya - yb)/(xa - xb)*(2*xa - 2*xc) - 2*ya +2*yc);
         double xp = (Math.pow(db,2) - Math.pow(da,2) + Math.pow(xa,2) - Math.pow(xb,2) - Math.pow(ya,2) - Math.pow(yb,2) - yp*(2*ya -2*yb))/(2*xa - 2*xb);
         Log.e("X","" + xp);
